@@ -1,0 +1,18 @@
+{
+  "lastSync": "2026-04-21",
+  "steps": [
+    {"day":"Apr 14","val":5373},{"day":"Apr 15","val":4724},{"day":"Apr 16","val":3269},
+    {"day":"Apr 17","val":4842},{"day":"Apr 18","val":5642},{"day":"Apr 19","val":1097},
+    {"day":"Apr 20","val":4763}
+  ],
+  "rhr": [{"day":"Apr 14","val":70},{"day":"Apr 15","val":66},{"day":"Apr 16","val":64}],
+  "hrv": [{"day":"Apr 14","val":29},{"day":"Apr 15","val":29},{"day":"Apr 16","val":34}],
+  "activeKcal": [
+    {"day":"Apr 14","val":234},{"day":"Apr 15","val":287},{"day":"Apr 16","val":255},
+    {"day":"Apr 17","val":110},{"day":"Apr 18","val":103},{"day":"Apr 19","val":19}
+  ],
+  "weight": [
+    {"day":"Mar 7","val":142.3},{"day":"Mar 11","val":143.9},
+    {"day":"Mar 16","val":143.2},{"day":"Apr 6","val":138.0}
+  ]
+}

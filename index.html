@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Krista — Training</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#f9f8f6;--surface:#fff;--border:#e8e6e1;--text:#1a1917;--text-2:#6b6860;--text-3:#a8a49e;--good:#2d6a4f;--good-bg:#eaf4ee;--warn:#8a5c00;--warn-bg:#fef6e4;--flag:#8b2e2e;--flag-bg:#fdf0f0;--pending:#a8a49e;--accent:#3a6bc4;--accent-bg:#eef2fb;--cycle:#7c4d8a;--cycle-bg:#f4eef7;--deload:#b85c00;--deload-bg:#fef0e4;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:"DM Sans",sans-serif;background:var(--bg);color:var(--text);font-size:15px;line-height:1.6;-webkit-font-smoothing:antialiased;}
+  nav{position:sticky;top:0;z-index:100;background:var(--bg);border-bottom:1px solid var(--border);padding:0 1.25rem;display:flex;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
+  nav::-webkit-scrollbar{display:none;}
+  nav button{font-family:"DM Sans",sans-serif;font-size:13px;font-weight:400;color:var(--text-3);background:none;border:none;border-bottom:2px solid transparent;padding:.85rem 1rem;cursor:pointer;white-space:nowrap;transition:color .15s;}
+  nav button.active{color:var(--text);border-bottom-color:var(--text);font-weight:500;}
+  .page-header{padding:2rem 1.25rem 1rem;}
+  .page-header h1{font-size:22px;font-weight:500;letter-spacing:-.02em;}
+  .page-header p{font-size:13px;color:var(--text-3);margin-top:2px;font-family:"DM Mono",monospace;}
+  .page{display:none;padding:0 1.25rem 4rem;}
+  .page.active{display:block;}
+  .section-label{font-family:"DM Mono",monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-3);margin:2rem 0 .75rem;}
+  .metric-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:1rem;}
+  .metric{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:.85rem;}
+  .metric-label{font-size:10px;font-family:"DM Mono",monospace;color:var(--text-3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;}
+  .metric-val{font-size:20px;font-weight:500;letter-spacing:-.02em;}
+  .metric-sub{font-size:11px;color:var(--text-3);margin-top:2px;}
+  .result-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:.75rem;}
+  .result-row{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border-bottom:1px solid var(--border);gap:12px;}
+  .result-row:last-child{border-bottom:none;}
+  .result-label{font-size:13px;color:var(--text-2);flex:1;}
+  .result-right{display:flex;align-items:center;gap:8px;flex-shrink:0;}
+  .result-val{font-size:14px;font-weight:500;font-family:"DM Mono",monospace;}
+  .result-bench{font-size:11px;color:var(--text-3);}
+  .tag{font-size:10px;font-weight:500;padding:2px 8px;border-radius:20px;font-family:"DM Mono",monospace;text-transform:uppercase;letter-spacing:.04em;}
+  .tag-good{background:var(--good-bg);color:var(--good);}
+  .tag-warn{background:var(--warn-bg);color:var(--warn);}
+  .tag-flag{background:var(--flag-bg);color:var(--flag);}
+  .pending-text{font-size:12px;color:var(--pending);font-style:italic;}
+  .note-box{background:var(--surface);border:1px solid var(--border);border-left:3px solid #c9b97a;border-radius:0 10px 10px 0;padding:12px 14px;font-size:13px;color:var(--text-2);line-height:1.6;margin-bottom:.75rem;}
+  .flag-box{background:var(--flag-bg);border:1px solid var(--border);border-left:3px solid #c47a7a;border-radius:0 10px 10px 0;padding:12px 14px;font-size:13px;color:var(--text-2);line-height:1.6;margin-bottom:.75rem;}
+  .photo-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:.75rem;}
+  .photo-wrap{border-radius:10px;overflow:hidden;border:1px solid var(--border);background:var(--surface);}
+  .photo-wrap img{width:100%;display:block;object-fit:cover;}
+  .photo-meta{padding:6px 10px;border-top:1px solid var(--border);}
+  .photo-meta-label{font-size:11px;font-family:"DM Mono",monospace;color:var(--text-3);}
+  .photo-meta-note{font-size:11px;color:var(--flag);margin-top:1px;}
+  .photo-meta-note-good{font-size:11px;color:var(--good);margin-top:1px;}
+  .mob-block{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:1rem;margin-bottom:.75rem;}
+  .mob-title{font-size:13px;font-weight:500;margin-bottom:.75rem;}
+  .mob-findings{list-style:none;margin-top:.75rem;}
+  .mob-findings li{font-size:13px;color:var(--text-2);padding:5px 0 5px 1.1rem;position:relative;border-top:1px solid var(--border);line-height:1.5;}
+  .mob-findings li:first-child{border-top:none;}
+  .mob-findings li::before{content:"—";position:absolute;left:0;color:var(--text-3);}
+  .dash-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;}
+  .dash-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:.85rem;}
+  .dash-label{font-size:10px;font-family:"DM Mono",monospace;color:var(--text-3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;}
+  .dash-val{font-size:24px;font-weight:500;letter-spacing:-.02em;}
+  .dash-unit{font-size:12px;color:var(--text-3);margin-left:3px;}
+  .dash-sub{font-size:11px;color:var(--text-3);margin-top:2px;}
+  .bar-chart{margin-top:10px;}
+  .bar-row{display:flex;align-items:center;gap:8px;margin-bottom:5px;}
+  .bar-day{font-size:10px;font-family:"DM Mono",monospace;color:var(--text-3);width:28px;text-align:right;flex-shrink:0;}
+  .bar-track{flex:1;background:var(--bg);border-radius:4px;height:14px;overflow:hidden;}
+  .bar-fill{height:100%;border-radius:4px;background:var(--accent);}
+  .bar-val{font-size:10px;font-family:"DM Mono",monospace;color:var(--text-3);width:44px;flex-shrink:0;}
+  .cycle-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:8px;}
+  .cycle-header{padding:.85rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+  .cycle-phase{font-size:13px;font-weight:500;}
+  .phase-pill{font-size:11px;font-weight:500;padding:3px 10px;border-radius:20px;font-family:"DM Mono",monospace;}
+  .phase-follicular{background:var(--good-bg);color:var(--good);}
+  .phase-ovulatory{background:var(--accent-bg);color:var(--accent);}
+  .phase-luteal{background:var(--cycle-bg);color:var(--cycle);}
+  .phase-menstrual{background:var(--flag-bg);color:var(--flag);}
+  .phase-deload{background:var(--deload-bg);color:var(--deload);}
+  .cycle-body{padding:.85rem;}
+  .cycle-row{display:flex;justify-content:space-between;align-items:baseline;padding:6px 0;border-bottom:1px solid var(--border);font-size:13px;}
+  .cycle-row:last-child{border-bottom:none;}
+  .cycle-row-label{color:var(--text-2);}
+  .cycle-row-val{font-family:"DM Mono",monospace;font-weight:500;}
+  .cycle-bar-wrap{margin:.85rem 0 .25rem;}
+  .cycle-bar-track{width:100%;height:8px;background:var(--bg);border-radius:4px;overflow:hidden;margin-bottom:4px;}
+  .cycle-bar-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--good) 0%,var(--accent) 35%,var(--cycle) 65%,var(--flag) 100%);}
+  .cycle-bar-labels{display:flex;justify-content:space-between;font-size:9px;font-family:"DM Mono",monospace;color:var(--text-3);}
+  .deload-alert{background:var(--deload-bg);border:1px solid var(--border);border-left:3px solid var(--deload);border-radius:0 10px 10px 0;padding:10px 14px;font-size:13px;color:var(--deload);line-height:1.6;margin-bottom:8px;}
+  .cycle-update{display:flex;gap:8px;align-items:center;margin-top:.75rem;padding-top:.75rem;border-top:1px solid var(--border);}
+  .cycle-update input{font-family:"DM Mono",monospace;font-size:13px;border:1px solid var(--border);border-radius:6px;padding:6px 10px;background:var(--bg);color:var(--text);flex:1;}
+  .cycle-update button{font-family:"DM Sans",sans-serif;font-size:13px;background:var(--text);color:var(--bg);border:none;border-radius:6px;padding:7px 14px;cursor:pointer;white-space:nowrap;}
+  .workout-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:.75rem;overflow:hidden;}
+  .workout-header{padding:12px 14px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;}
+  .workout-header-left{display:flex;flex-direction:column;gap:2px;}
+  .workout-date{font-family:"DM Mono",monospace;font-size:11px;color:var(--text-3);}
+  .workout-name{font-size:14px;font-weight:500;}
+  .workout-summary{font-size:12px;color:var(--text-3);font-family:"DM Mono",monospace;}
+  .workout-chevron{font-size:12px;color:var(--text-3);}
+  .workout-body{display:none;border-top:1px solid var(--border);padding:14px;}
+  .workout-body.open{display:block;}
+  .exercise-block{margin-bottom:1rem;}
+  .exercise-block:last-child{margin-bottom:0;}
+  .exercise-name{font-size:13px;font-weight:500;margin-bottom:6px;}
+  .set-row{display:grid;grid-template-columns:28px 1fr 1fr 1fr 32px;gap:6px;align-items:center;margin-bottom:4px;}
+  .set-num{font-family:"DM Mono",monospace;font-size:11px;color:var(--text-3);text-align:center;}
+  .set-input{font-family:"DM Mono",monospace;font-size:13px;border:1px solid var(--border);border-radius:6px;padding:6px 8px;width:100%;background:var(--bg);color:var(--text);text-align:center;-webkit-appearance:none;}
+  .set-input:focus{outline:none;border-color:var(--text);background:var(--surface);}
+  .set-input::placeholder{color:var(--text-3);}
+  .set-label{font-family:"DM Mono",monospace;font-size:10px;color:var(--text-3);text-align:center;}
+  .set-headers{display:grid;grid-template-columns:28px 1fr 1fr 1fr 32px;gap:6px;margin-bottom:4px;}
+  .add-set-btn{font-size:12px;color:var(--text-3);background:none;border:1px dashed var(--border);border-radius:6px;padding:6px;width:100%;cursor:pointer;margin-top:4px;font-family:"DM Sans",sans-serif;}
+  .del-btn{font-size:14px;color:var(--text-3);background:none;border:none;cursor:pointer;padding:4px;line-height:1;}
+  .new-workout-btn{width:100%;background:var(--surface);color:var(--text);border:1px solid var(--border);border-radius:10px;padding:14px;font-family:"DM Sans",sans-serif;font-size:14px;cursor:pointer;margin-bottom:.75rem;display:flex;align-items:center;justify-content:center;gap:8px;}
+  .add-exercise-btn{font-size:13px;color:var(--text-2);background:none;border:1px dashed var(--border);border-radius:8px;padding:8px 12px;cursor:pointer;font-family:"DM Sans",sans-serif;margin-top:.75rem;width:100%;}
+  .empty-state{text-align:center;padding:3rem 1rem;color:var(--text-3);font-size:14px;}
+  .modal-overlay{display:none;position:fixed;inset:0;background:rgba(26,25,23,.5);z-index:200;align-items:flex-end;justify-content:center;}
+  .modal-overlay.open{display:flex;}
+  .modal{background:var(--surface);border-radius:16px 16px 0 0;padding:1.5rem;width:100%;max-width:480px;max-height:85vh;overflow-y:auto;}
+  .modal h3{font-size:16px;font-weight:500;margin-bottom:1rem;}
+  .form-group{margin-bottom:1rem;}
+  .form-label{font-size:12px;font-family:"DM Mono",monospace;color:var(--text-3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;display:block;}
+  .form-input{width:100%;border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-family:"DM Sans",sans-serif;font-size:14px;background:var(--bg);color:var(--text);}
+  .form-input:focus{outline:none;border-color:var(--text);}
+  .modal-actions{display:flex;gap:8px;margin-top:1.25rem;}
+  .btn-primary{flex:1;background:var(--text);color:var(--bg);border:none;border-radius:8px;padding:12px;font-family:"DM Sans",sans-serif;font-size:14px;font-weight:500;cursor:pointer;}
+  .btn-secondary{background:none;color:var(--text-2);border:1px solid var(--border);border-radius:8px;padding:12px 16px;font-family:"DM Sans",sans-serif;font-size:14px;cursor:pointer;}
+  .sync-note{font-size:11px;font-family:"DM Mono",monospace;color:var(--text-3);text-align:center;padding:.5rem 0;}
+</style>
+</head>
+<body>
+
+<nav>
+  <button class="active" onclick="showPage('dashboard',this)">Dashboard</button>
+  <button onclick="showPage('baseline',this)">Baseline</button>
+  <button onclick="showPage('mobility',this)">Mobility</button>
+  <button onclick="showPage('form',this)">Form</button>
+  <button onclick="showPage('photos',this)">Photos</button>
+  <button onclick="showPage('workouts',this)">Workouts</button>
+</nav>
+
+<!-- DASHBOARD -->
+<div id="page-dashboard" class="page active">
+  <div class="page-header"><h1>Dashboard</h1><p id="dash-date"></p></div>
+  <div id="dash-content"><div style="padding:2rem;text-align:center;color:var(--text-3);font-size:13px;">Loading...</div></div>
+</div>
+
+<!-- BASELINE -->
+<div id="page-baseline" class="page">
+  <div class="page-header"><h1>Krista</h1><p>Assessment baseline — Apr 20–24, 2026</p></div>
+  <div class="section-label">Body composition — Evolt 360</div>
+  <div class="metric-grid">
+    <div class="metric"><div class="metric-label">Weight</div><div class="metric-val">136.7</div><div class="metric-sub">lbs</div></div>
+    <div class="metric"><div class="metric-label">Body fat</div><div class="metric-val">26.9%</div><div class="metric-sub">Optimal</div></div>
+    <div class="metric"><div class="metric-label">FFMI</div><div class="metric-val">16.1</div><div class="metric-sub">Target 18+</div></div>
+    <div class="metric"><div class="metric-label">Lean mass</div><div class="metric-val">99.9</div><div class="metric-sub">lbs · Optimal</div></div>
+    <div class="metric"><div class="metric-label">Skel. muscle</div><div class="metric-val">55.1</div><div class="metric-sub">kg · Optimal</div></div>
+    <div class="metric"><div class="metric-label">Visceral fat</div><div class="metric-val">Lv 6</div><div class="metric-sub">Balanced</div></div>
+    <div class="metric"><div class="metric-label">BMR</div><div class="metric-val">1,348</div><div class="metric-sub">kcal</div></div>
+    <div class="metric"><div class="metric-label">TEE</div><div class="metric-val">2,075</div><div class="metric-sub">kcal</div></div>
+    <div class="metric"><div class="metric-label">Bio age</div><div class="metric-val">38</div><div class="metric-sub">Chrono: 40</div></div>
+  </div>
+  <div class="section-label">Physical assessments</div>
+  <div class="result-card">
+    <div class="result-row"><span class="result-label">Dead hang</span><div class="result-right"><span class="result-val">52 sec</span><span class="result-bench">target 60s</span><span class="tag tag-warn">Good</span></div></div>
+    <div class="result-row"><span class="result-label">Broad jump</span><div class="result-right"><span class="result-val">6'2"</span><span class="result-bench">target 6'+</span><span class="tag tag-good">Strong</span></div></div>
+    <div class="result-row"><span class="result-label">Push-ups</span><div class="result-right"><span class="result-val">15 reps</span><span class="result-bench">target 25+</span><span class="tag tag-warn">Good</span></div></div>
+    <div class="result-row"><span class="result-label">Squat 1RM</span><div class="result-right"><span class="result-val">165 lbs</span><span class="result-bench">1.21× BW</span><span class="tag tag-warn">Near good</span></div></div>
+    <div class="result-row"><span class="result-label">Deadlift 1RM</span><div class="result-right"><span class="result-val">175 lbs</span><span class="result-bench">1.28× BW</span><span class="tag tag-warn">Good</span></div></div>
+    <div class="result-row"><span class="result-label">Cooper run (12 min)</span><div class="result-right"><span class="pending-text">pending — Thu</span></div></div>
+    <div class="result-row"><span class="result-label">30-sec bike</span><div class="result-right"><span class="pending-text">pending — Fri</span></div></div>
+  </div>
+  <div class="flag-box">Injury: right proximal hamstring/adductor — 2 weeks, not improving. No pain during squat/deadlift. Physio eval needed. BSS contraindicated until resolved.</div>
+  <div class="note-box">FFMI 16.1 — significant runway to 18+. Squat/deadlift gap (165 vs 175) = posterior chain is limiting factor. Right glute dropout under load. Summer: hypertrophy + posterior chain development.</div>
+</div>
+
+<!-- MOBILITY -->
+<div id="page-mobility" class="page">
+  <div class="page-header"><h1>Mobility screen</h1><p>April 20, 2026</p></div>
+  <div class="mob-block">
+    <div class="mob-title">Overhead squat</div>
+    <div class="photo-grid-2">
+      <div class="photo-wrap"><img src="photos/mobility/ohs-front.jpg" alt="OHS front"><div class="photo-meta"><div class="photo-meta-label">Front — bottom</div><div class="photo-meta-note">Bar drifting forward</div></div></div>
+      <div class="photo-wrap"><img src="photos/mobility/ohs-side.jpg" alt="OHS side"><div class="photo-meta"><div class="photo-meta-label">Side — bottom</div><div class="photo-meta-note">Significant torso lean</div></div></div>
+    </div>
+    <ul class="mob-findings"><li>Bar drifts forward + torso lean — limited thoracic mobility and/or tight ankles</li><li>Arms not fully vertical — shoulder/thoracic restriction</li></ul>
+  </div>
+  <div class="mob-block">
+    <div class="mob-title">Hip hinge</div>
+    <div style="max-width:240px;"><div class="photo-wrap"><img src="photos/mobility/hinge-side.jpg" alt="Hip hinge"><div class="photo-meta"><div class="photo-meta-label">Side — hinged</div><div class="photo-meta-note">Weight slightly forward</div></div></div></div>
+    <ul class="mob-findings"><li>Good pattern, neutral spine maintained</li><li>Weight slightly toward toes — tight hamstrings or athletic habit</li></ul>
+  </div>
+  <div class="mob-block">
+    <div class="mob-title">Shoulder scratch test</div>
+    <div class="photo-grid-2">
+      <div class="photo-wrap"><img src="photos/mobility/shoulder-ext.jpg" alt="Shoulder ER"><div class="photo-meta"><div class="photo-meta-label">Right arm over top</div><div class="photo-meta-note-good">Hands touch — good ER</div></div></div>
+      <div class="photo-wrap"><img src="photos/mobility/shoulder-int.jpg" alt="Shoulder IR"><div class="photo-meta"><div class="photo-meta-label">Right arm up back</div><div class="photo-meta-note">Significant IR deficit</div></div></div>
+    </div>
+    <ul class="mob-findings"><li>ER (arm over top): hands touch — normal/good</li><li>IR (arm up back): significant restriction — classic throwing athlete pattern</li><li>Right posterior capsule tightness — addressable with prehab</li></ul>
+  </div>
+  <div class="note-box">Prehab every upper body session: ankle mobility + thoracic rotation + right shoulder sleeper stretch, cross-body stretch, IR drills. Avoid behind-the-neck loading and wide-grip upright rows until IR improves.</div>
+</div>
+
+<!-- FORM -->
+<div id="page-form" class="page">
+  <div class="page-header"><h1>Form reference</h1><p>Updated as assessments continue</p></div>
+  <div class="mob-block">
+    <div class="mob-title">Back squat — 1RM (165 lbs) · Apr 21</div>
+    <div class="photo-grid-2">
+      <div class="photo-wrap"><img src="photos/form/squat-bottom.jpg" alt="Squat bottom"><div class="photo-meta"><div class="photo-meta-label">Bottom position</div><div class="photo-meta-note-good">Bar solid, chest up</div></div></div>
+      <div class="photo-wrap"><img src="photos/form/squat-ascent.jpg" alt="Squat ascent"><div class="photo-meta"><div class="photo-meta-label">Ascent — out of hole</div><div class="photo-meta-note">Right knee caves vs left</div></div></div>
+    </div>
+    <ul class="mob-findings">
+      <li>Bottom: bar placement solid, chest up, no dramatic forward lean</li>
+      <li>Ascent: right knee collapses inward (valgus) — right glute/hip abductor not firing</li>
+      <li>Directly connected to right proximal hamstring/adductor injury</li>
+      <li>Left side tracks well — asymmetry is the key issue</li>
+    </ul>
+  </div>
+  <div class="flag-box">Fix: glute med + hip abductor activation every lower body warm-up — banded clamshells, lateral walks, single-leg glute bridges. Cue "right knee out" on every squat rep.</div>
+</div>
+
+<!-- PHOTOS -->
+<div id="page-photos" class="page">
+  <div class="page-header"><h1>Progress photos</h1><p>Retest every 4 weeks — fasted, same conditions</p></div>
+  <div class="section-label">April 20, 2026 — baseline</div>
+  <div class="photo-grid-2">
+    <div class="photo-wrap"><img src="photos/baseline/apr20-front-flex.jpg" alt="Front flexed"><div class="photo-meta"><div class="photo-meta-label">Front — flexed</div></div></div>
+    <div class="photo-wrap"><img src="photos/baseline/apr20-front-relax.jpg" alt="Front relaxed"><div class="photo-meta"><div class="photo-meta-label">Front — relaxed</div></div></div>
+    <div class="photo-wrap"><img src="photos/baseline/apr20-side-flex.jpg" alt="Side flexed"><div class="photo-meta"><div class="photo-meta-label">Side — flexed</div></div></div>
+    <div class="photo-wrap"><img src="photos/baseline/apr20-side-relax.jpg" alt="Side relaxed"><div class="photo-meta"><div class="photo-meta-label">Side — relaxed</div></div></div>
+  </div>
+</div>
+
+<!-- WORKOUTS -->
+<div id="page-workouts" class="page">
+  <div class="page-header"><h1>Workouts</h1><p id="workout-count-label">0 sessions logged</p></div>
+  <button class="new-workout-btn" onclick="openNewWorkout()">+ Log workout</button>
+  <div id="workout-list"></div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="workout-modal">
+  <div class="modal">
+    <h3>Log workout</h3>
+    <div class="form-group"><label class="form-label">Date</label><input type="date" id="wo-date" class="form-input"></div>
+    <div class="form-group"><label class="form-label">Workout name</label><input type="text" id="wo-name" class="form-input" placeholder="e.g. Strength Day A"></div>
+    <div id="exercise-list-modal"></div>
+    <button class="add-exercise-btn" onclick="addExercise()">+ Add exercise</button>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeModal()">Cancel</button>
+      <button class="btn-primary" onclick="saveWorkout()">Save workout</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const AVG_CYCLE_LENGTH = 32;
+const DEFAULT_CYCLE_START = "2026-04-13";
+
+function getCycleStart() {
+  return localStorage.getItem("krista_cycle_start") || DEFAULT_CYCLE_START;
+}
+
+function saveCycleStart(d) {
+  localStorage.setItem("krista_cycle_start", d);
+}
+
+function getCycleInfo(startStr) {
+  const start = new Date(startStr); start.setHours(0,0,0,0);
+  const today = new Date(); today.setHours(0,0,0,0);
+  const dayOfCycle = Math.floor((today - start) / 86400000) + 1;
+  const nextPeriod = new Date(start); nextPeriod.setDate(nextPeriod.getDate() + AVG_CYCLE_LENGTH);
+  const daysUntilPeriod = Math.floor((nextPeriod - today) / 86400000);
+  const deloadStart = new Date(nextPeriod); deloadStart.setDate(deloadStart.getDate() - 7);
+  const daysUntilDeload = Math.floor((deloadStart - today) / 86400000);
+  const inDeload = daysUntilDeload <= 0 && daysUntilPeriod > 0;
+  const inPeriod = dayOfCycle >= 1 && dayOfCycle <= 5;
+  let phase, phaseClass;
+  if (inPeriod) { phase="Menstrual"; phaseClass="phase-menstrual"; }
+  else if (inDeload) { phase="Luteal — deload week"; phaseClass="phase-deload"; }
+  else if (dayOfCycle <= 13) { phase="Follicular"; phaseClass="phase-follicular"; }
+  else if (dayOfCycle <= 16) { phase="Ovulatory"; phaseClass="phase-ovulatory"; }
+  else { phase="Luteal"; phaseClass="phase-luteal"; }
+  const notes = {
+    "Menstrual":"Energy may be lower. Train to feel — reduce intensity if needed.",
+    "Follicular":"Estrogen rising — strength and energy at peak. Best window for heavy lifts.",
+    "Ovulatory":"Peak strength window. Go hard.",
+    "Luteal":"Progesterone rising. Maintain training, watch recovery closely.",
+    "Luteal — deload week":"Drop volume 40%, intensity to 60–65%. Connective tissue more vulnerable — don't push through."
+  };
+  const progressPct = Math.min(Math.round((dayOfCycle / AVG_CYCLE_LENGTH) * 100), 100);
+  return { dayOfCycle, daysUntilPeriod, daysUntilDeload, inDeload, inPeriod, phase, phaseClass, note: notes[phase]||"", progressPct, nextPeriod, deloadStart };
+}
+
+function fmt(d) { return d.toLocaleDateString("en-US",{month:"short",day:"numeric"}); }
+
+async function renderDashboard() {
+  const today = new Date();
+  document.getElementById("dash-date").textContent = today.toLocaleDateString("en-US",{weekday:"long",month:"long",day:"numeric"});
+
+  let health;
+  try {
+    const res = await fetch("data/health.json?t=" + Date.now());
+    health = await res.json();
+  } catch(e) {
+    document.getElementById("dash-content").innerHTML = '<div style="padding:1rem;font-size:13px;color:var(--text-3);">Could not load health data.</div>';
+    return;
+  }
+
+  const cycle = getCycleInfo(getCycleStart());
+  const steps = health.steps;
+  const latestSteps = steps[steps.length-1];
+  const avgSteps = Math.round(steps.reduce((a,s)=>a+s.val,0)/steps.length);
+  const maxSteps = Math.max(...steps.map(s=>s.val));
+  const latestRHR = health.rhr[health.rhr.length-1];
+  const latestHRV = health.hrv[health.hrv.length-1];
+  const latestKcal = health.activeKcal[health.activeKcal.length-1];
+  const latestWeight = health.weight[health.weight.length-1];
+  const prevWeight = health.weight[health.weight.length-2];
+  const weightDiff = (latestWeight.val - prevWeight.val).toFixed(1);
+  const weightColor = weightDiff > 0 ? "var(--flag)" : "var(--good)";
+  const weightSign = weightDiff > 0 ? "+" : "";
+  const stepsBarHTML = steps.map(s=>{
+    const pct = Math.round((s.val/maxSteps)*100);
+    return `<div class="bar-row"><div class="bar-day">${s.day.split(" ")[1]}</div><div class="bar-track"><div class="bar-fill" style="width:${pct}%"></div></div><div class="bar-val">${s.val.toLocaleString()}</div></div>`;
+  }).join("");
+  const hrvNote = latestHRV.val < 20 ? "Low — prioritize recovery" : latestHRV.val < 35 ? "Moderate — train as planned" : "Good — ready for intensity";
+  const deloadAlert = cycle.inDeload ? `<div class="deload-alert">Deload week active — reduce volume 40%, intensity to 60–65%. Period estimated ${fmt(cycle.nextPeriod)}.</div>` : "";
+  const daysUntilDeloadStr = cycle.inDeload ? "Active now" : `in ${cycle.daysUntilDeload} days (${fmt(cycle.deloadStart)})`;
+  const daysUntilPeriodStr = cycle.daysUntilPeriod <= 0 ? "Now" : `in ${cycle.daysUntilPeriod} days (${fmt(cycle.nextPeriod)})`;
+
+  document.getElementById("dash-content").innerHTML = `
+    ${deloadAlert}
+    <div class="section-label">Cycle</div>
+    <div class="cycle-card">
+      <div class="cycle-header">
+        <div class="cycle-phase">Day ${cycle.dayOfCycle} of ~${AVG_CYCLE_LENGTH}</div>
+        <span class="phase-pill ${cycle.phaseClass}">${cycle.phase}</span>
+      </div>
+      <div class="cycle-body">
+        <div class="cycle-bar-wrap">
+          <div class="cycle-bar-track"><div class="cycle-bar-fill" style="width:${cycle.progressPct}%"></div></div>
+          <div class="cycle-bar-labels"><span>Day 1</span><span>Follicular</span><span>Ovulation</span><span>Luteal</span><span>Day ${AVG_CYCLE_LENGTH}</span></div>
+        </div>
+        <div class="cycle-row"><span class="cycle-row-label">Next period (est.)</span><span class="cycle-row-val">${daysUntilPeriodStr}</span></div>
+        <div class="cycle-row"><span class="cycle-row-label">Deload window</span><span class="cycle-row-val">${daysUntilDeloadStr}</span></div>
+        <div class="cycle-row" style="border-bottom:none;"><span class="cycle-row-label" style="font-size:12px;line-height:1.5;">${cycle.note}</span></div>
+        <div class="cycle-update">
+          <input type="date" id="cycle-start-input" value="${getCycleStart()}">
+          <button onclick="updateCycleStart()">Period started</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-label">Recovery</div>
+    <div class="dash-row">
+      <div class="dash-card"><div class="dash-label">Resting HR</div><div class="dash-val">${latestRHR.val}<span class="dash-unit">bpm</span></div><div class="dash-sub">${latestRHR.day}</div></div>
+      <div class="dash-card"><div class="dash-label">HRV</div><div class="dash-val">${latestHRV.val}<span class="dash-unit">ms</span></div><div class="dash-sub">${hrvNote}</div></div>
+    </div>
+
+    <div class="section-label">Activity — last 7 days</div>
+    <div class="dash-card" style="margin-bottom:8px;">
+      <div class="dash-label">Steps</div>
+      <div style="display:flex;align-items:baseline;gap:12px;margin-bottom:10px;">
+        <div class="dash-val">${latestSteps.val.toLocaleString()}<span class="dash-unit">recent</span></div>
+        <div style="font-size:12px;color:var(--text-3);">avg ${avgSteps.toLocaleString()}/day</div>
+      </div>
+      <div class="bar-chart">${stepsBarHTML}</div>
+    </div>
+    <div class="dash-row">
+      <div class="dash-card"><div class="dash-label">Active kcal</div><div class="dash-val">${latestKcal.val}<span class="dash-unit">kcal</span></div><div class="dash-sub">${latestKcal.day}</div></div>
+      <div class="dash-card"><div class="dash-label">Sleep</div><div class="dash-val" style="font-size:16px;color:var(--text-3);">Not tracked</div><div class="dash-sub">Enable in Health app</div></div>
+    </div>
+
+    <div class="section-label">Weight trend</div>
+    <div class="dash-card">
+      <div class="dash-label">Latest weight</div>
+      <div style="display:flex;align-items:baseline;gap:10px;">
+        <div class="dash-val">${latestWeight.val}<span class="dash-unit">lbs</span></div>
+        <div style="font-size:12px;color:${weightColor};">${weightSign}${weightDiff} lbs since ${prevWeight.day}</div>
+      </div>
+      <div class="dash-sub" style="margin-top:6px;">Evolt baseline Apr 20: 136.7 lbs</div>
+    </div>
+    <div class="sync-note">Health data synced ${health.lastSync} · Ask Claude to refresh</div>
+  `;
+}
+
+function updateCycleStart() {
+  const val = document.getElementById("cycle-start-input").value;
+  if (!val) return;
+  saveCycleStart(val);
+  renderDashboard();
+}
+
+// Workouts — localStorage for GitHub Pages
+function getWorkouts() { try { return JSON.parse(localStorage.getItem("krista_workouts")||"[]"); } catch(e) { return []; } }
+function saveWorkoutsLocal(w) { localStorage.setItem("krista_workouts", JSON.stringify(w)); }
+
+let workouts = getWorkouts();
+let exercises = [], exerciseCounter = 0;
+
+function showPage(id,btn) {
+  document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+  document.querySelectorAll("nav button").forEach(b=>b.classList.remove("active"));
+  document.getElementById("page-"+id).classList.add("active");
+  btn.classList.add("active");
+}
+function openNewWorkout(){exercises=[];exerciseCounter=0;document.getElementById("exercise-list-modal").innerHTML="";document.getElementById("wo-date").value=new Date().toISOString().split("T")[0];document.getElementById("wo-name").value="";document.getElementById("workout-modal").classList.add("open");addExercise();}
+function closeModal(){document.getElementById("workout-modal").classList.remove("open");}
+function addExercise(){const id=exerciseCounter++;exercises.push({id,name:"",sets:[{reps:"",weight:"",notes:""}]});renderExerciseModal(id);}
+function renderExerciseModal(id){const ex=exercises.find(e=>e.id===id);let el=document.getElementById("ex-block-"+id);if(!el){el=document.createElement("div");el.id="ex-block-"+id;el.className="exercise-block";document.getElementById("exercise-list-modal").appendChild(el);}let s=`<div class="set-headers"><div></div><div class="set-label">reps</div><div class="set-label">weight</div><div class="set-label">notes</div><div></div></div>`;ex.sets.forEach((set,si)=>{s+=`<div class="set-row" id="set-${id}-${si}"><div class="set-num">${si+1}</div><input class="set-input" type="number" placeholder="0" value="${set.reps}" onchange="updateSet(${id},${si},'reps',this.value)"><input class="set-input" type="number" placeholder="lbs" value="${set.weight}" onchange="updateSet(${id},${si},'weight',this.value)"><input class="set-input" type="text" placeholder="—" value="${set.notes}" onchange="updateSet(${id},${si},'notes',this.value)"><button class="del-btn" onclick="removeSet(${id},${si})">×</button></div>`;});el.innerHTML=`<input class="form-input" style="margin-bottom:8px;" type="text" placeholder="Exercise name" value="${ex.name}" onchange="updateExName(${id},this.value)">${s}<button class="add-set-btn" onclick="addSet(${id})">+ set</button>`;}
+function updateExName(id,val){const ex=exercises.find(e=>e.id===id);if(ex)ex.name=val;}
+function updateSet(id,si,field,val){const ex=exercises.find(e=>e.id===id);if(ex&&ex.sets[si])ex.sets[si][field]=val;}
+function addSet(id){const ex=exercises.find(e=>e.id===id);if(ex){ex.sets.push({reps:"",weight:"",notes:""});renderExerciseModal(id);}}
+function removeSet(id,si){const ex=exercises.find(e=>e.id===id);if(ex&&ex.sets.length>1){ex.sets.splice(si,1);renderExerciseModal(id);}}
+function saveWorkout(){const date=document.getElementById("wo-date").value,name=document.getElementById("wo-name").value||"Workout";exercises.forEach(ex=>{const n=document.querySelector(`#ex-block-${ex.id} input[type=text]`);if(n)ex.name=n.value;ex.sets.forEach((set,si)=>{const row=document.getElementById(`set-${ex.id}-${si}`);if(row){const inp=row.querySelectorAll("input");set.reps=inp[0].value;set.weight=inp[1].value;set.notes=inp[2].value;}});});workouts.unshift({id:Date.now(),date,name,exercises:exercises.filter(e=>e.name.trim())});saveWorkoutsLocal(workouts);renderWorkouts();closeModal();}
+function renderWorkouts(){const list=document.getElementById("workout-list");document.getElementById("workout-count-label").textContent=workouts.length+" session"+(workouts.length!==1?"s":"")+" logged";if(workouts.length===0){list.innerHTML='<div class="empty-state">No workouts logged yet.<br>Tap "+ Log workout" to start.</div>';return;}list.innerHTML=workouts.map((wo,wi)=>{const totalSets=wo.exercises.reduce((a,e)=>a+e.sets.length,0);const exHTML=wo.exercises.map(ex=>{const sHTML=ex.sets.map((set,si)=>`<div class="set-row"><div class="set-num">${si+1}</div><div class="set-input" style="background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:6px 8px;text-align:center;font-size:13px;">${set.reps||"—"}</div><div class="set-input" style="background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:6px 8px;text-align:center;font-size:13px;">${set.weight?set.weight+" lbs":"—"}</div><div class="set-input" style="background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:6px 8px;text-align:center;font-size:13px;">${set.notes||"—"}</div><div></div></div>`).join("");return `<div class="exercise-block"><div class="exercise-name">${ex.name}</div><div class="set-headers"><div></div><div class="set-label">reps</div><div class="set-label">weight</div><div class="set-label">notes</div><div></div></div>${sHTML}</div>`;}).join("");return `<div class="workout-card"><div class="workout-header" onclick="toggleWorkout(${wi})"><div class="workout-header-left"><div class="workout-date">${wo.date}</div><div class="workout-name">${wo.name}</div><div class="workout-summary">${wo.exercises.length} exercise${wo.exercises.length!==1?"s":""} · ${totalSets} sets</div></div><div class="workout-chevron" id="chev-${wi}">▼</div></div><div class="workout-body" id="wo-body-${wi}">${exHTML}<button class="add-exercise-btn" style="color:var(--flag);" onclick="deleteWorkout(${wi})">Delete workout</button></div></div>`;}).join("");}
+function toggleWorkout(i){const b=document.getElementById("wo-body-"+i),c=document.getElementById("chev-"+i);b.classList.toggle("open");c.textContent=b.classList.contains("open")?"▲":"▼";}
+function deleteWorkout(i){if(!confirm("Delete this workout?"))return;workouts.splice(i,1);saveWorkoutsLocal(workouts);renderWorkouts();}
+
+renderDashboard();
+renderWorkouts();
+</script>
+</body>
+</html>
